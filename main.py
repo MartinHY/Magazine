@@ -21,6 +21,7 @@ if __name__ == '__main__':
     magazines.fetch_magazines('National+Geographic')
     magazines.fetch_magazines('New+Scientist')
     magazines.fetch_magazines('The+Guardian')
+    magazines.fetch_magazines('The+Economist')
 
     cd = join(os.path.dirname(__file__), "magazines")
     mm = ali.search_file(
