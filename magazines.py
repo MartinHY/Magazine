@@ -1,4 +1,5 @@
 import os
+import random
 import time
 import urllib.parse
 import urllib.request
@@ -12,8 +13,14 @@ from selenium.webdriver.support import expected_conditions as EC
 import traceback
 from PyPDF2 import PdfFileReader
 
-user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-headers = {'User-Agent': user_agent}
+# 创建一个agent池
+agentPools = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0"
+]
+
+headers = {'User-Agent': agentPools[random.randint(0, 2)]}
 
 click_xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "btn-default", " " ))]'
 
@@ -44,11 +51,18 @@ def get_pdf_download(key_word, url):
         response = urllib.request.urlopen(req)
         the_page = response.read()
         soup = BeautifulSoup(the_page, "html.parser", from_encoding="utf-8")
+        list = soup.select('.btn-default')
+        if list.count == 0:
+            return
         wait_url = url + soup.select('.btn-default')[0]['href']
         print("正式下载等待网页地址 : " + wait_url)
 
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
+        option.add_argument('--disable-popup-blocking')
+        option.add_argument('blink-settings=imagesEnabled=false')  # 不加载图片, 提升速度
+        option.add_argument('--disable-gpu')  # 谷歌文档提到需要加上这个属性来规避bug
+        option.add_argument('disable-infobars')  # 隐藏"Chrome正在受到自动软件的控制"
         option.add_argument("--user-data-dir=" + r"D:/chrome/")
 
         prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': cd}
@@ -81,7 +95,7 @@ def get_pdf_download(key_word, url):
 
                 driver.find_element_by_xpath(click_xpath).click()
 
-                time.sleep(120)
+                downloads_done(cd)
 
                 # 下载后重命名
                 os.chdir(cd)
@@ -103,6 +117,13 @@ def get_pdf_download(key_word, url):
                 print(e)
             finally:
                 driver.quit()
+
+
+def downloads_done(path):
+    for i in os.listdir(path):
+        if ".crdownload" in i:
+            time.sleep(0.5)
+            downloads_done(path)
 
 
 def isValidPDF_pathfile(pathfile):
