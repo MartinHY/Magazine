@@ -95,7 +95,7 @@ def get_pdf_download(key_word, url):
 
                 driver.find_element_by_xpath(click_xpath).click()
 
-                downloads_done(cd)
+                downloads_done(pdf)
 
                 # 下载后重命名
                 os.chdir(cd)
@@ -120,10 +120,9 @@ def get_pdf_download(key_word, url):
 
 
 def downloads_done(path):
-    for i in os.listdir(path):
-        if ".crdownload" in i:
-            time.sleep(0.5)
-            downloads_done(path)
+    if not os.path.exists(path):
+        time.sleep(0.5)
+        downloads_done(path)
 
 
 def isValidPDF_pathfile(pathfile):

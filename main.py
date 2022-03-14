@@ -18,12 +18,12 @@ def print_hi(name):
 if __name__ == '__main__':
     ali = Aligo()  # 第一次使用，会弹出二维码，供扫描登录
     user = ali.get_user()  # 获取用户信息
+    magazines.fetch_magazines('All+About+History')
     magazines.fetch_magazines('National+Geographic')
     magazines.fetch_magazines('New+Scientist')
     magazines.fetch_magazines('The+Guardian')
     magazines.fetch_magazines('The+Economist')
     magazines.fetch_magazines('Scientific+American')
-    magazines.fetch_magazines('All + about + history')
 
     cd = join(os.path.dirname(__file__), "magazines")
     mm = ali.search_file(
